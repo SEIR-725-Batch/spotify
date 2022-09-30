@@ -17,19 +17,15 @@
 </div>
 <div class="detail__container">
     <div class="buttons">
-        <a href="{% url 'artist_update' artist.pk %}"
-            <a href="" class="button is-info">
-                <span class="icon">
-                    <i class="fas fa-edit"></i>
-                </span>
-            </a>
+        <a href="{% url 'artist_update' artist.pk %}" class="button is-info">
+            <span class="icon">
+                <i class="fas fa-edit"></i>
+            </span>
         </a>
-        <a href="/artists/{{artist.id}}/delete">
-            <a href="" class="button is-danger">
-                <span class="icon">
-                    <i class="fas fa-trash-alt"></i>
-                </span>
-            </a>
+        <a href="/artists/{{artist.id}}/delete" class="button is-danger">
+            <span class="icon">
+                <i class="fas fa-trash-alt"></i>
+            </span>
         </a>
     </div>
     <div class="detail__about">
