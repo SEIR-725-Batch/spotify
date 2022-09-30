@@ -1,6 +1,10 @@
 from django.shortcuts import render
+from django.urls import reverse
 from django.views.generic.base import TemplateView
 from .models import Artist
+from django.views.generic.edit import CreateView, UpdateView, DeleteView
+# after our other imports 
+from django.views.generic import DetailView
 
 # Create your views here.
 
@@ -24,6 +28,32 @@ class ArtistList(TemplateView):
         if name != None:
             # .filter is the sql WHERE statement and name__icontains is doing a search for any name that contains the query param
             context["artists"] = Artist.objects.filter(name__icontains=name)
+            context["stuff_at_top"] = f"Searching through Artists list for {name}"
         else:
             context["artists"] = Artist.objects.all()
+            context["stuff_at_top"] = "Trending Artists"
         return context
+
+class ArtistCreate(CreateView):
+    model = Artist
+    fields = ['name', 'img', 'bio']
+    template_name = "artist_create.html"
+    success_url = "/artists/"
+
+class ArtistDetail(DetailView):
+    model = Artist
+    template_name = "artist_detail.html"
+
+class ArtistUpdate(UpdateView):
+    model = Artist
+    fields = ['name', 'img', 'bio']
+    template_name = "artist_update.html"
+    success_url = "/artists/"
+
+    def get_success_url(self):
+        return reverse('artist_detail', kwargs={'pk': self.object.pk})
+
+class ArtistDelete(DeleteView):
+    model = Artist
+    template_name = "artist_delete_confirmation.html"
+    success_url = "/artists/"

@@ -1,11 +1,11 @@
 {% extends 'base.html' %} 
 {% block title %}
-Artists
+{{stuff_at_top}}
 {% endblock %}
 
 {% block content %}
 
-<h1 class="title">Trending Artists</h1>
+<h1 class="title">{{stuff_at_top}}</h1>
 
 <form class="mb-5" method="get">
   <div class="field has-addons">
@@ -24,14 +24,16 @@ Artists
   {% for artist in artists %}
   <a href="">
     <div class="card">
-      <div class="card-image">
-        <figure class="image is-square">
-          <img src="{{artist.img}}" alt="{{artist.name}}" />
-        </figure>
-      </div>
-      <div class="card-header">
-        <p class="card-header-title">{{artist.name}}</p>
-      </div>
+      <a href="{% url 'artist_detail' artist.pk %}" >
+        <div class="card-image">
+          <figure class="image is-square">
+            <img src="{{artist.img}}" alt="{{artist.name}}" />
+          </figure>
+        </div>
+        <div class="card-header">
+          <p class="card-header-title">{{artist.name}}</p>
+        </div>
+      </a>
     </div>
   </a>
   {% empty %}
