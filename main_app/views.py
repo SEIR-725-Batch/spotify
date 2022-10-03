@@ -1,7 +1,9 @@
-from django.shortcuts import render
+# at top of file
+from django.shortcuts import redirect
+from django.views import View
 from django.urls import reverse
 from django.views.generic.base import TemplateView
-from .models import Artist
+from .models import Artist, Song
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 # after our other imports 
 from django.views.generic import DetailView
@@ -60,3 +62,14 @@ class ArtistDelete(DeleteView):
     model = Artist
     template_name = "artist_delete_confirmation.html"
     success_url = "/artists/"
+
+class SongCreate(View):
+
+    def post(self, request, pk):
+        formTitle = request.POST.get("title")
+        minutes = request.POST.get("minutes")
+        seconds = request.POST.get("seconds")
+        formLength = 60 * int(minutes) + int(seconds)
+        theArtist = Artist.objects.get(pk=pk)
+        Song.objects.create(title=formTitle, length=formLength, artist=theArtist)
+        return redirect('artist_detail', pk=pk)
