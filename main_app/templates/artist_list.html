@@ -22,7 +22,6 @@
 </form>
 <div class="gallery">
   {% for artist in artists %}
-  <a href="">
     <div class="card">
       <a href="{% url 'artist_detail' artist.pk %}" >
         <div class="card-image">
@@ -34,8 +33,7 @@
           <p class="card-header-title">{{artist.name}}</p>
         </div>
       </a>
-    </div>
-  </a>
+      </div>
   {% empty %}
     <h1>No artists found matching your query</h1>
   {% endfor %}

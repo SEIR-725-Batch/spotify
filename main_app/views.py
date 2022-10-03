@@ -19,16 +19,19 @@ class ArtistList(TemplateView):
     template_name = "artist_list.html"
 #     In here, I want to check if there has been a query made
 # I know the queries will have a key of name
+# const context = {
+#     artists: //finding ArtistList,
+#     stuff_at_top: "This is a string"
+# }
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        name = self.request.GET.get("name")
+        mySearchName = self.request.GET.get("name")
         # If a query exists we will filter by name 
-        print(name)
-        if name != None:
+        if mySearchName != None:
             # .filter is the sql WHERE statement and name__icontains is doing a search for any name that contains the query param
-            context["artists"] = Artist.objects.filter(name__icontains=name)
-            context["stuff_at_top"] = f"Searching through Artists list for {name}"
+            context["artists"] = Artist.objects.filter(name__icontains=mySearchName)
+            context["stuff_at_top"] = f"Searching through Artists list for {mySearchName}"
         else:
             context["artists"] = Artist.objects.all()
             context["stuff_at_top"] = "Trending Artists"
@@ -46,7 +49,7 @@ class ArtistDetail(DetailView):
 
 class ArtistUpdate(UpdateView):
     model = Artist
-    fields = ['name', 'img', 'bio']
+    fields = ['name', 'img', 'bio', 'verified_artist']
     template_name = "artist_update.html"
     success_url = "/artists/"
 
