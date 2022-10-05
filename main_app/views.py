@@ -1,5 +1,5 @@
 # at top of file
-from django.shortcuts import redirect
+from django.shortcuts import redirect, render
 from django.views import View
 from django.urls import reverse
 from django.views.generic.base import TemplateView
@@ -7,6 +7,13 @@ from .models import Artist, Song, Playlist
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 # after our other imports 
 from django.views.generic import DetailView
+# at top of file with other imports
+from django.contrib.auth import login
+from django.contrib.auth.forms import UserCreationForm
+# Auth
+from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
+
 
 # Create your views here.
 
@@ -23,6 +30,7 @@ class Home(TemplateView):
 class About(TemplateView):
     template_name = "about.html"
 
+@method_decorator(login_required, name='dispatch')
 class ArtistList(TemplateView):
     template_name = "artist_list.html"
 #     In here, I want to check if there has been a query made
@@ -41,16 +49,38 @@ class ArtistList(TemplateView):
             context["artists"] = Artist.objects.filter(name__icontains=mySearchName)
             context["stuff_at_top"] = f"Searching through Artists list for {mySearchName}"
         else:
-            context["artists"] = Artist.objects.all()
+            context["artists"] = Artist.objects.filter(user=self.request.user)
             context["stuff_at_top"] = "Trending Artists"
         return context
 
+@method_decorator(login_required, name='dispatch')
 class ArtistCreate(CreateView):
     model = Artist
     fields = ['name', 'img', 'bio']
     template_name = "artist_create.html"
-    success_url = "/artists/"
 
+    # This is our new method that will add the user into our submitted form
+    def form_valid(self, form):
+        # form.instance = {
+            # name: Baby Shark 2,
+            # img: my image url,
+            # Bio: Some string
+        # }
+        form.instance.user = self.request.user
+        # form.instance = {
+            # name: Another Test,
+            # img: a.com,
+            # Bio: Proving a point,
+            # user: self.request.user
+        # }
+        # form.instance.verified_artist = False
+        return super(ArtistCreate, self).form_valid(form)
+
+    def get_success_url(self):
+        print(self.kwargs)
+        return reverse('artist_detail', kwargs={'pk': self.object.pk})
+
+@method_decorator(login_required, name='dispatch')
 class ArtistDetail(DetailView):
     model = Artist
     template_name = "artist_detail.html"
@@ -60,6 +90,7 @@ class ArtistDetail(DetailView):
         context['playlists'] = Playlist.objects.all()
         return context
 
+@method_decorator(login_required, name='dispatch')
 class ArtistUpdate(UpdateView):
     model = Artist
     fields = ['name', 'img', 'bio', 'verified_artist']
@@ -69,11 +100,13 @@ class ArtistUpdate(UpdateView):
     def get_success_url(self):
         return reverse('artist_detail', kwargs={'pk': self.object.pk})
 
+@method_decorator(login_required, name='dispatch')
 class ArtistDelete(DeleteView):
     model = Artist
     template_name = "artist_delete_confirmation.html"
     success_url = "/artists/"
 
+@method_decorator(login_required, name='dispatch')
 class SongCreate(View):
 
     def post(self, request, pk):
@@ -102,3 +135,18 @@ class PlaylistSongAssoc(View):
         
         return redirect('home')
 
+class Signup(View):
+    # show a form to fill out
+    def get(self, request):
+        form = UserCreationForm()
+        context = {"form": form}
+        return render(request, "registration/signup.html", context)
+    # on form submit, validate the form and login the user.
+    def post(self, request):
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
+            return redirect("artist_list")
+        else:
+            return redirect("signup")
