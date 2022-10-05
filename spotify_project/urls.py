@@ -21,3 +21,4 @@ urlpatterns = [
     path('accounts/', include('django.contrib.auth.urls')),
     path('', include('main_app.urls')),
 ]
+# Redeploy
