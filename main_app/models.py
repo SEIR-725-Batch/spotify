@@ -1,6 +1,7 @@
 from django.db import models
 import time
 from django.contrib.auth.models import User
+from django.http import JsonResponse
 
 # Create your models here.
 # class User(models.Model):

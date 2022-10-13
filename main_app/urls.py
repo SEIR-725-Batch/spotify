@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, include
 from . import views
 
 urlpatterns = [
@@ -13,4 +13,7 @@ urlpatterns = [
     path('playlists/<int:pk>/songs/<int:song_pk>/', views.PlaylistSongAssoc.as_view(), name="playlist_song_assoc"),
     path('accounts/signup/', views.Signup.as_view(), name="signup"),
     path('profile/new', views.ProfileCreate.as_view(), name="profile_create"),
+    path('', views.artist_list, name='artist_list'),
+    path('songs/', views.SongList.as_view(), name='song_list'),
+    path('songs/<int:pk>', views.SongDetail.as_view(), name='song_detail'),
 ]

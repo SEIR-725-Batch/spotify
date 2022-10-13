@@ -13,7 +13,10 @@ from django.contrib.auth.forms import UserCreationForm
 # Auth
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
-
+from django.http import JsonResponse
+from rest_framework import generics
+from .serializers import ArtistSerializer, SongSerializers
+from .models import Artist
 
 # Create your views here.
 
@@ -30,28 +33,10 @@ class Home(TemplateView):
 class About(TemplateView):
     template_name = "about.html"
 
-@method_decorator(login_required, name='dispatch')
-class ArtistList(TemplateView):
-    template_name = "artist_list.html"
-#     In here, I want to check if there has been a query made
-# I know the queries will have a key of name
-# const context = {
-#     artists: //finding ArtistList,
-#     stuff_at_top: "This is a string"
-# }
+class ArtistList(generics.ListCreateAPIView):
+    queryset = Artist.objects.all()
+    serializer_class = ArtistSerializer
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        mySearchName = self.request.GET.get("name")
-        # If a query exists we will filter by name 
-        if mySearchName != None:
-            # .filter is the sql WHERE statement and name__icontains is doing a search for any name that contains the query param
-            context["artists"] = Artist.objects.filter(name__icontains=mySearchName)
-            context["stuff_at_top"] = f"Searching through Artists list for {mySearchName}"
-        else:
-            context["artists"] = Artist.objects.filter(user=self.request.user)
-            context["stuff_at_top"] = "Trending Artists"
-        return context
 
 @method_decorator(login_required, name='dispatch')
 class ArtistCreate(CreateView):
@@ -80,15 +65,9 @@ class ArtistCreate(CreateView):
         print(self.kwargs)
         return reverse('artist_detail', kwargs={'pk': self.object.pk})
 
-@method_decorator(login_required, name='dispatch')
-class ArtistDetail(DetailView):
-    model = Artist
-    template_name = "artist_detail.html"
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['playlists'] = Playlist.objects.all()
-        return context
+class ArtistDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Artist.objects.all()
+    serializer_class = ArtistSerializer
 
 @method_decorator(login_required, name='dispatch')
 class ArtistUpdate(UpdateView):
@@ -156,3 +135,16 @@ class ProfileCreate(CreateView):
     fields = ['user', 'favorite_color', 'state_abbrev']
     template_name = "profile_create.html"
     success_url= "/"
+
+def artist_list(request):
+    artists = Artist.objects.all().values('name', 'img', 'bio', 'verified_artist', 'user') # only grab some attributes from our database, else we can't serialize it.
+    artists_list = list(artists) # convert our artists to a list instead of QuerySet
+    return JsonResponse(artists_list, safe=False) # safe=False is needed if the first parameter is not a dictionary.
+
+class SongList(generics.ListCreateAPIView):
+    queryset = Song.objects.all()
+    serializer_class = SongSerializers
+
+class SongDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Song.objects.all()
+    serializer_class = SongSerializers
