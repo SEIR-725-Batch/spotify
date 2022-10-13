@@ -6,6 +6,11 @@ from django.contrib.auth.models import User
 # class User(models.Model):
 #     username: models.CharField(max_)
 
+class Profile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    favorite_color = models.CharField(max_length=50)
+    state_abbrev = models.CharField(max_length=2)
+
 class Artist(models.Model):
 
     name = models.CharField(max_length=100)

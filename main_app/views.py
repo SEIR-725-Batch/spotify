@@ -3,7 +3,7 @@ from django.shortcuts import redirect, render
 from django.views import View
 from django.urls import reverse
 from django.views.generic.base import TemplateView
-from .models import Artist, Song, Playlist
+from .models import Artist, Song, Playlist, Profile
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 # after our other imports 
 from django.views.generic import DetailView
@@ -150,3 +150,9 @@ class Signup(View):
             return redirect("artist_list")
         else:
             return redirect("signup")
+
+class ProfileCreate(CreateView):
+    model = Profile
+    fields = ['user', 'favorite_color', 'state_abbrev']
+    template_name = "profile_create.html"
+    success_url= "/"
