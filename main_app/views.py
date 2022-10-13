@@ -15,7 +15,7 @@ from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.http import JsonResponse
 from rest_framework import generics
-from .serializers import ArtistSerializer, SongSerializers
+from .serializers import ArtistSerializer, SongSerializer
 from .models import Artist
 
 # Create your views here.
@@ -143,8 +143,8 @@ def artist_list(request):
 
 class SongList(generics.ListCreateAPIView):
     queryset = Song.objects.all()
-    serializer_class = SongSerializers
+    serializer_class = SongSerializer
 
 class SongDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Song.objects.all()
-    serializer_class = SongSerializers
+    serializer_class = SongSerializer
